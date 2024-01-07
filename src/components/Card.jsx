@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-
 const Card = ({ title, subtitle }) => {
   return (
     <View style={styles.card}>
@@ -13,7 +12,7 @@ const Card = ({ title, subtitle }) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFF',
-    padding: 20,
+    padding: 15,
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: {

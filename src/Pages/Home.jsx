@@ -1,33 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import Card from '../components/Card';
-const Home = () => {
+import TabBar from '../components/TabBar';
+import nviVerses from '../data/nvi.json';
+
+
+const getVerseOfTheDay = () => {
+  const currentDate = new Date();
+  const dayOfYear = Math.ceil((currentDate - new Date(currentDate.getFullYear(), 0, 1)) / 86400000);
+  const chapterIndex = Math.floor(dayOfYear / 50); 
+  const verseIndex = dayOfYear % 50; 
+  return nviVerses[chapterIndex]?.chapters[0]?.[verseIndex] || '';
+};
+
+const Home = ({ navigation }) => {
   const [verse, setVerse] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('https://www.abibliadigital.com.br/api/verses/nvi/random')
-      .then(response => response.json())
-      .then(data => {
-        const { text, book } = data;
-        setVerse(`${book.name} ${data.chapter}:${data.number} - ${text}`);
-      })
-      .catch(error => {
-        console.error('Erro ao obter versículo:', error);
-      });
+    const verseOfTheDay = getVerseOfTheDay();
+    setVerse(verseOfTheDay);
+    setLoading(false);
   }, []);
 
   return (
     <View style={styles.container}>
-        <View style={styles.navHeader}>
-      <Text style={styles.header}>Bíblia Chamon</Text>
-      {verse ? (
-        <>
-        <Card title="Versículo que deus te enviou:" subtitle={verse}></Card>
-        </>
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>Sacred Insights</Text>
+      </View>
+
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#fff" />
+        </View>
       ) : (
-        <Text style={styles.loading}>📖Carregando...</Text>
+        <View style={styles.content}>
+          <Card title="Versículo que Deus te enviou:" subtitle={verse}></Card>
+        </View>
       )}
-    </View>
+
+      <TabBar navigation={navigation} activeTab="Home" />
     </View>
   );
 };
@@ -35,38 +47,29 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
     backgroundColor: '#111',
   },
+  headerContainer: {
+    paddingTop: 40,
+    paddingBottom: 20,
+    backgroundColor: '#000',
+    alignItems: 'center',
+  },
   header: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: 'white',
-    alignContent: 'center',
-    alignSelf: 'center',
-    marginBottom: 30,
   },
-  verseText: {
-    fontSize: 18,
-    marginBottom: 5,
-    color: 'white'
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  navHeader: { 
-   marginBottom: 400,
-  },
-  verse: {
-    fontSize: 16,
-    fontStyle: 'italic',
-    color: 'white',
-    textAlign: 'center',
-  },
-  loading: {
-    fontSize: 16,
-    fontStyle: 'italic',
-    textAlign: 'center',
-    color: 'white',
+  content: {
+    marginTop: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
 });
 
